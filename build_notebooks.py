@@ -1,11 +1,19 @@
-"""Gera os notebooks do curso em notebooks/*.ipynb."""
+"""Gera os notebooks do curso em notebooks/*.ipynb.
 
+Com SOLUCOES=1, preenche os exercícios com as soluções (para testar a correção).
+Com OUT=<pasta>, grava em outra pasta.
+"""
+
+import os
 from pathlib import Path
 
 import nbformat as nbf
 
+from exercicios import EXERCICIOS, celulas_exercicios
+
 REPO = "naubergois/curso-yolo-colab"
-OUT = Path(__file__).parent / "notebooks"
+OUT = Path(os.environ.get("OUT", Path(__file__).parent / "notebooks"))
+SOLUCOES = os.environ.get("SOLUCOES") == "1"
 
 INSTALL = "!pip install -q ultralytics"
 
@@ -60,11 +68,19 @@ def notebook(nome, celulas):
         "kernelspec": {"name": "python3", "display_name": "Python 3"},
         "language_info": {"name": "python"},
     }
+    if nome in EXERCICIOS:
+        celulas = celulas[:-1] + celulas_exercicios(EXERCICIOS[nome], SOLUCOES) + celulas[-1:]
     out = []
     for tipo, texto in celulas:
         texto = texto.strip("\n")
         texto = texto.replace("{BADGE}", badge(nome))
-        out.append(nbf.v4.new_markdown_cell(texto) if tipo == "md" else nbf.v4.new_code_cell(texto))
+        if tipo == "md":
+            out.append(nbf.v4.new_markdown_cell(texto))
+        else:
+            cel = nbf.v4.new_code_cell(texto)
+            if tipo == "form":
+                cel.metadata["cellView"] = "form"
+            out.append(cel)
     nb.cells = out
     OUT.mkdir(exist_ok=True)
     nbf.write(nb, OUT / nome)

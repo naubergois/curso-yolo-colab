@@ -18,6 +18,18 @@ No Colab, use **Ambiente de execução → Executar tudo**. As aulas 1 a 3 rodam
 
 Os notebooks já vêm executados: dá para ver imagens, gráficos e vídeos de resultado antes de rodar qualquer coisa.
 
+## Exercícios
+
+Cada aula termina com seis exercícios, 24 no total. Você escreve a resposta, roda a célula e a função `conferir` diz na hora se acertou. A solução fica escondida em **Ver solução**, embaixo de cada enunciado.
+
+Os exercícios ficam em `exercicios.py`. Para conferir que todas as soluções passam na correção:
+
+```bash
+SOLUCOES=1 OUT=/tmp/solucoes python build_notebooks.py
+(cd /tmp/solucoes && jupyter nbconvert --to notebook --execute --inplace *.ipynb)
+grep -h "exercícios certos" /tmp/solucoes/*.ipynb
+```
+
 ## Editar
 
 Os notebooks são gerados por `build_notebooks.py`, que cria versões sem saída. Para atualizar, gere, execute e limpe:
