@@ -15,6 +15,7 @@ RUIDO = ("New https://pypi.org/project/ultralytics", "engine/trainer: ", " 0% â”
 
 def limpar_texto(texto, prefixos):
     linhas = []
+    texto = texto.replace("\x1b[K", "\r")
     for linha in ANSI.sub("", texto).split("\n"):
         linha = linha.split("\r")[-1]
         if any(r in linha for r in RUIDO):
