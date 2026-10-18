@@ -5,11 +5,12 @@ Com OUT=<pasta>, grava em outra pasta.
 """
 
 import os
+import re
 from pathlib import Path
 
 import nbformat as nbf
 
-from exercicios import EXERCICIOS, celulas_exercicios
+from exercicios import EXERCICIOS, celulas_exercicios, id_exercicio
 
 REPO = "naubergois/curso-yolo-colab"
 OUT = Path(os.environ.get("OUT", Path(__file__).parent / "notebooks"))
@@ -75,7 +76,11 @@ def notebook(nome, celulas):
         texto = texto.strip("\n")
         texto = texto.replace("{BADGE}", badge(nome))
         if tipo == "md":
-            out.append(nbf.v4.new_markdown_cell(texto))
+            cel = nbf.v4.new_markdown_cell(texto)
+            ex = re.match(r"### Exercício (\d+)\.", texto)
+            if ex:
+                cel.metadata["id"] = id_exercicio(nome, int(ex.group(1)))
+            out.append(cel)
         else:
             cel = nbf.v4.new_code_cell(texto)
             if tipo == "form":

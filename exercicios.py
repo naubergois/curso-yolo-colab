@@ -26,6 +26,11 @@ def placar():
 '''
 
 
+def id_exercicio(notebook, n):
+    """Id da célula do enunciado, usado nos links #scrollTo= do Colab."""
+    return f"exercicio-{notebook[:2]}-{n}"
+
+
 def celulas_exercicios(aula, solucoes=False):
     celulas = [
         ("md", """
