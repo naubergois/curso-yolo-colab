@@ -16,13 +16,19 @@ No Colab, use **Ambiente de execução → Executar tudo**. As aulas 1 a 3 rodam
 - `home-objects-compressed.mp4`, dos [assets da Ultralytics](https://github.com/ultralytics/assets/releases/tag/v0.0.0)
 - `vtest.avi`, dos [exemplos do OpenCV](https://github.com/opencv/opencv/tree/master/samples/data)
 
+Os notebooks já vêm executados: dá para ver imagens, gráficos e vídeos de resultado antes de rodar qualquer coisa.
+
 ## Editar
 
-Os notebooks são gerados por `build_notebooks.py`. Altere o script e rode:
+Os notebooks são gerados por `build_notebooks.py`, que cria versões sem saída. Para atualizar, gere, execute e limpe:
 
 ```bash
-pip install nbformat
+pip install nbformat nbconvert ipykernel ultralytics lap pandas
 python build_notebooks.py
+mkdir -p /tmp/exec && cp notebooks/*.ipynb /tmp/exec/
+(cd /tmp/exec && jupyter nbconvert --to notebook --execute --inplace *.ipynb)
+cp /tmp/exec/*.ipynb notebooks/
+python clean_outputs.py /tmp/exec notebooks/*.ipynb
 ```
 
 Mais em [naubergois.com/curso-yolo](https://naubergois.com/curso-yolo/).
