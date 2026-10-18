@@ -10,71 +10,21 @@ from pathlib import Path
 
 import nbformat as nbf
 
+from comum import HELPERS, INSTALL, badge, novo_notebook
 from exercicios import EXERCICIOS, celulas_exercicios, id_exercicio
 
-REPO = "naubergois/curso-yolo-colab"
 OUT = Path(os.environ.get("OUT", Path(__file__).parent / "notebooks"))
 SOLUCOES = os.environ.get("SOLUCOES") == "1"
 
-INSTALL = "!pip install -q ultralytics"
-
-HELPERS = '''import base64
-import subprocess
-import urllib.request
-from pathlib import Path
-
-from IPython.display import HTML, display
-
-
-def baixar(url, destino):
-    if not Path(destino).exists():
-        urllib.request.urlretrieve(url, destino)
-    print(f"{destino}: {Path(destino).stat().st_size / 1e6:.1f} MB")
-    return destino
-
-
-def mostrar_video(caminho, largura=720):
-    """Converte para H.264 (o navegador não toca mp4v) e embute no notebook."""
-    web = str(Path(caminho).with_suffix("")) + "_web.mp4"
-    subprocess.run(
-        ["ffmpeg", "-y", "-loglevel", "error", "-i", caminho,
-         "-vcodec", "libx264", "-pix_fmt", "yuv420p", "-movflags", "+faststart", web],
-        check=True,
-    )
-    dados = base64.b64encode(Path(web).read_bytes()).decode()
-    display(HTML(f'<video width="{largura}" controls autoplay muted loop>'
-                 f'<source src="data:video/mp4;base64,{dados}" type="video/mp4"></video>'))
-    return web
-
-
-def baixar_para_maquina(caminho):
-    try:
-        from google.colab import files
-        files.download(caminho)
-    except ImportError:
-        print(f"Fora do Colab: o arquivo está em {Path(caminho).resolve()}")'''
-
-
-def badge(nome):
-    url = f"https://colab.research.google.com/github/{REPO}/blob/main/notebooks/{nome}"
-    return (f'<a href="{url}" target="_blank">'
-            '<img src="https://colab.research.google.com/assets/colab-badge.svg" '
-            'alt="Abrir no Colab"/></a>')
-
 
 def notebook(nome, celulas):
-    nb = nbf.v4.new_notebook()
-    nb.metadata = {
-        "colab": {"provenance": []},
-        "kernelspec": {"name": "python3", "display_name": "Python 3"},
-        "language_info": {"name": "python"},
-    }
+    nb = novo_notebook()
     if nome in EXERCICIOS:
         celulas = celulas[:-1] + celulas_exercicios(EXERCICIOS[nome], SOLUCOES) + celulas[-1:]
     out = []
     for tipo, texto in celulas:
         texto = texto.strip("\n")
-        texto = texto.replace("{BADGE}", badge(nome))
+        texto = texto.replace("{BADGE}", badge(f"notebooks/{nome}"))
         if tipo == "md":
             cel = nbf.v4.new_markdown_cell(texto)
             ex = re.match(r"### Exercício (\d+)\.", texto)
